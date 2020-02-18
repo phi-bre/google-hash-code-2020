@@ -2,7 +2,7 @@
   "name": "google-hash-code-2020",
   "version": "1.0.0",
   "scripts": {
-    "start": "concurrently --kill-others 'parcel watch src/index.js --target node' 'nodemon --watch dist dist'",
+    "start": "concurrently --kill-others \"parcel watch src/index.js --target node\" \"nodemon --watch ./dist ./dist\"",
     "build": "parcel build src/index.js --target node"
   },
   "devDependencies": {
