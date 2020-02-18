@@ -4,9 +4,11 @@
   "scripts": {
     "setup": "yarn install --ignore-engines",
     "start": "parcel watch src/index.js --target node",
-    "build": "parcel build src/index.js --target node"
+    "build": "parcel build src/index.js --target node",
+    "test": "parcel watch test/index.js --target node"
   },
   "devDependencies": {
+    "baretest": "^1.0.0",
     "parcel-bundler": "^1.12.4",
     "parcel-plugin-asset-csv": "0.1.4",
     "parcel-plugin-run-server": "^1.1.2",
