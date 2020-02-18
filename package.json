@@ -2,13 +2,21 @@
   "name": "google-hash-code-2020",
   "version": "1.0.0",
   "scripts": {
-    "start": "concurrently --kill-others \"parcel watch src/index.js --target node\" \"nodemon --watch ./dist ./dist\"",
+    "setup": "yarn install --ignore-engines",
+    "start": "parcel watch src/index.js --target node",
     "build": "parcel build src/index.js --target node"
   },
   "devDependencies": {
-    "concurrently": "^5.1.0",
-    "nodemon": "^2.0.2",
     "parcel-bundler": "^1.12.4",
-    "parcel-plugin-asset-csv": "0.1.4"
+    "parcel-plugin-asset-csv": "0.1.4",
+    "parcel-plugin-run-server": "^1.1.2",
+    "parcel-plugin-text": "^0.9.5"
+  },
+  "parcel-plugin-text": {
+    "extensions": [
+      "in",
+      "txt",
+      "text"
+    ]
   }
 }
