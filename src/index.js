@@ -1,5 +1,6 @@
 import read from './reader';
 import write from './writer';
+import algorithm from "./algorithm";
 
 const files = [
     'a_example',
@@ -19,7 +20,8 @@ function run(file) {
     console.log('INPUT:');
     console.log(input);
 
-    const output = {count: 10, types: Array.from({length: 10}, (v, i) => i)};
+
+    const output = algorithm(input);
 
     console.log('OUTPUT:');
     console.log(output);
