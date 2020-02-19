@@ -1524,7 +1524,7 @@ core-util-is@1.0.2, core-util-is@~1.0.0:
   resolved "https://registry.yarnpkg.com/core-util-is/-/core-util-is-1.0.2.tgz#b5fd54220aa2bc5ab57aab7140c940754503c1a7"
   integrity sha1-tf1UIgqivFq1eqtxQMlAdUUDwac=
 
-cosmiconfig@^5.0.0, cosmiconfig@^5.0.2:
+cosmiconfig@^5.0.0:
   version "5.2.1"
   resolved "https://registry.yarnpkg.com/cosmiconfig/-/cosmiconfig-5.2.1.tgz#040f726809c591e77a17c0a3626ca45b4f168b1a"
   integrity sha512-H65gsXo1SKjf8zmrJ67eJk8aIRKV5ff2D4uKZIBZShbhGSpEmsQOPW/SKMKYhSTrqR7ufy6RP69rPogdaPh/kA==
@@ -3066,11 +3066,6 @@ log-symbols@^2.2.0:
   dependencies:
     chalk "^2.0.1"
 
-loglevel@^1.6.1:
-  version "1.6.7"
-  resolved "https://registry.yarnpkg.com/loglevel/-/loglevel-1.6.7.tgz#b3e034233188c68b889f5b862415306f565e2c56"
-  integrity sha512-cY2eLFrQSAfVPhCgH1s7JI73tMbg9YC3v3+ZHVW67sBS7UxWzNEk/ZBbSfLykBWHp33dqqtOv82gjhKEi81T/A==
-
 loose-envify@^1.0.0:
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/loose-envify/-/loose-envify-1.4.0.tgz#71ee51fa7be4caec1a63839f7e682d8132d30caf"
@@ -3510,11 +3505,6 @@ pako@~1.0.5:
   resolved "https://registry.yarnpkg.com/pako/-/pako-1.0.11.tgz#6c9599d340d54dfd3946380252a35705a6b992bf"
   integrity sha512-4hLB8Py4zZce5s4yd9XzopqwVv/yGNhV1Bl8NTmCq1763HeK2+EwVTv+leGeL13Dnh2wfbqowVPXCIO0z4taYw==
 
-papaparse@^4.6.2:
-  version "4.6.3"
-  resolved "https://registry.yarnpkg.com/papaparse/-/papaparse-4.6.3.tgz#742e5eaaa97fa6c7e1358d2934d8f18f44aee781"
-  integrity sha512-LRq7BrHC2kHPBYSD50aKuw/B/dGcg29omyJbKWY3KsYUZU69RKwaBHu13jGmCYBtOc4odsLCrFyk6imfyNubJQ==
-
 parcel-bundler@^1.12.4:
   version "1.12.4"
   resolved "https://registry.yarnpkg.com/parcel-bundler/-/parcel-bundler-1.12.4.tgz#31223f4ab4d00323a109fce28d5e46775409a9ee"
@@ -3580,14 +3570,6 @@ parcel-bundler@^1.12.4:
     v8-compile-cache "^2.0.0"
     ws "^5.1.1"
 
-parcel-plugin-asset-csv@0.1.4:
-  version "0.1.4"
-  resolved "https://registry.yarnpkg.com/parcel-plugin-asset-csv/-/parcel-plugin-asset-csv-0.1.4.tgz#278626576a140e7c75c30e2b0dd05c453a131a93"
-  integrity sha512-rELgigQ7mQmHi534pY5ZosSNwb51pPbis7UQPGtzwsHxiFRUxre61ZhTtxVAVll9+One5RgUhCXCVytAQ6Zm5A==
-  dependencies:
-    normalize-path "^3.0.0"
-    papaparse "^4.6.2"
-
 parcel-plugin-run-server@^1.1.2:
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/parcel-plugin-run-server/-/parcel-plugin-run-server-1.1.2.tgz#2bfccc1140d57c7fc9ceaa77ef3e4e19e611a98f"
@@ -3596,14 +3578,6 @@ parcel-plugin-run-server@^1.1.2:
     chalk "^2.4.1"
     execa "^1.0.0"
     portfinder "^1.0.20"
-
-parcel-plugin-text@^0.9.5:
-  version "0.9.5"
-  resolved "https://registry.yarnpkg.com/parcel-plugin-text/-/parcel-plugin-text-0.9.5.tgz#bc65353a8d64437d3432282e01e9239020cc43ea"
-  integrity sha512-r5EMpco5EwIh2QKXHwGXK1reNZfUk3/6zO4he09TZ3K07YihMgeKynqQDfTdR54giCAr0nRjJ53akqX2RyGb+A==
-  dependencies:
-    cosmiconfig "^5.0.2"
-    loglevel "^1.6.1"
 
 parse-asn1@^5.0.0:
   version "5.1.5"
