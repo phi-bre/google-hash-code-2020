@@ -76,7 +76,7 @@ function calculateTotal(libs: Library[], scores: number[], total_days: number): 
                 processed.push({ library: currentSignUpLib, scanned_books: 0 });
             }
 
-            if (currentSignUpLeft !== libs.length) {
+            if (currentSignUpIndex < libs.length) {
                 currentSignUpLib = libs[currentSignUpIndex++];
                 currentSignUpLeft = currentSignUpLib.num_days_for_signup;
             }
@@ -86,7 +86,7 @@ function calculateTotal(libs: Library[], scores: number[], total_days: number): 
         for (let j = 0; j < processed.length; j++) {
             const lib = processed[j];
 
-            for (let k = 0; k < lib.library.num_books_per_day; i++) {
+            for (let k = 0; k < lib.library.num_books_per_day; k++) {
                 if (lib.scanned_books >= lib.library.books.length) {
                     break;
                 }
@@ -146,17 +146,20 @@ function runWithRatio(input: Reader, ratio: number): Writer {
 }
 
 export default function (input: Reader): Writer {
-    let output = runWithRatio(input, 0.15);
-    // let max = 0;
-    //
-    // for (let ratio = 0.1; ratio < 1; ratio += 0.1) {
-    //     const res = runWithRatio(input, ratio);
-    //     const total = calculateTotal(res.libraries, input.scores, input.num_days);
-    //
-    //     if (total > max) {
-    //         output = res;
-    //     }
-    // }
+    let output = runWithRatio(input, 0.12);
+    let max = 0;
+
+    for (let ratio = 0.1; ratio < 1; ratio += 0.1) {
+        const res = runWithRatio(input, ratio);
+        const total = calculateTotal(res.libraries, input.scores, input.num_days);
+
+        if (total > max) {
+            output = res;
+            max = total;
+        }
+    }
+
+    console.log(max);
 
     return output;
 }
