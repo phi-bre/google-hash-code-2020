@@ -11,8 +11,9 @@ export default function (path: string): Reader {
   let lines = input.split('\n');
   const [num_books, num_libraries, num_days] = lines[0].split(' ').map(Number);
   const scores = lines[1].split(' ').map(Number);
-  lines = lines.slice(3);
+  lines = lines.slice(2).filter(string => !!string);
   const libraries = [];
+
   for (let i = 0; i < lines.length; i += 2) {
     const line1 = lines[i];
     const line2 = lines[i + 1];
