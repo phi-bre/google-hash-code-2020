@@ -41,6 +41,10 @@ setup(files, (file, label) => {
   const output = algorithm(input);
   console.timeEnd(label);
 
+  log.white('TOTAL: ', output.libraries.reduce((prev, cur) =>
+    prev + cur.books.reduce((prev, cur) => prev + input.scores[cur], 0), 0));
+  console.log();
+
   log.magenta('OUTPUT: ', output);
   write(output)(`../out/${file}.txt`);
 });
