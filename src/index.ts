@@ -13,17 +13,19 @@ export const files = [
   'f_libraries_of_the_world',
 ];
 
+export interface Library {
+  num_books_in_library: number,
+  num_days_for_signup: number,
+  num_days_to_finish: number,
+  books: number[],
+}
+
 export interface Reader {
   num_books: number;
   num_libraries: number;
   num_days: number;
   scores: number[];
-  libraries: Array<{
-    num_books_in_library: number,
-    num_days_for_signup: number,
-    num_days_to_finish: number,
-    books: number[],
-  }>;
+  libraries: Library[];
 }
 
 export interface Writer {

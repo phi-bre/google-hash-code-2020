@@ -18,7 +18,6 @@ export default function (path: string): Reader {
     const line2 = libraries[i + 1];
     const [num_books_in_library, num_days_for_signup, num_days_to_finish] = line1.split(' ').map(Number);
     const books = line2.split(' ').map(Number);
-
     libraries.push({
       num_books_in_library,
       num_days_for_signup,
