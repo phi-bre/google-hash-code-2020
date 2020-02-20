@@ -15,9 +15,9 @@ export const files = [
 
 export interface Library {
   id: number;
-  num_books_in_library: number,
-  num_days_for_signup: number,
-  num_books_per_day: number,
+  num_books_in_library?: number,
+  num_days_for_signup?: number,
+  num_books_per_day?: number,
   books: number[],
 }
 
