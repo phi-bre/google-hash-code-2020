@@ -6,14 +6,15 @@ import algorithm from './algorithm';
 
 export const files = [
   'a_example',
-  // 'b_read_on',
-  // 'c_incunabula',
-  // 'd_tough_choices',
-  // 'e_so_many_books',
-  // 'f_libraries_of_the_world',
+  'b_read_on',
+  'c_incunabula',
+  'd_tough_choices',
+  'e_so_many_books',
+  'f_libraries_of_the_world',
 ];
 
 export interface Library {
+  id: number;
   num_books_in_library: number,
   num_days_for_signup: number,
   num_books_per_day: number,
@@ -29,7 +30,7 @@ export interface Reader {
 }
 
 export interface Writer {
-
+  libraries: Library[];
 }
 
 setup(files, (file, label) => {
@@ -40,6 +41,6 @@ setup(files, (file, label) => {
   const output = algorithm(input);
   console.timeEnd(label);
 
-  // log.magenta('OUTPUT: ', output);
-  // write(output)(`../out/${file}.txt`);
+  log.magenta('OUTPUT: ', output);
+  write(output)(`../out/${file}.txt`);
 });

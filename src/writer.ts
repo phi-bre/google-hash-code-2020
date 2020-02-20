@@ -9,6 +9,16 @@ export function write(string: string) {
     }
 }
 
-export default function ({}: Writer) {
-    return write('');
+export default function (writer: Writer) {
+    let output = writer.libraries.length.toString() + '\n';
+
+    console.log(writer.libraries.length);
+
+    for (const library of writer.libraries) {
+        output += library.id + ' ' + library.books.length + '\n';
+        output += library.books.join(' ');
+        output += '\n';
+    }
+
+    return write(output);
 }
