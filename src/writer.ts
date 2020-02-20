@@ -9,6 +9,6 @@ export function write(string: string) {
     }
 }
 
-export default function ({count, types}: Writer) {
-    return write(count + '\n' + types.join(' '));
+export default function ({}: Writer) {
+    return write('');
 }

@@ -5,31 +5,39 @@ import write from './writer';
 import algorithm from './algorithm';
 
 export const files = [
-    'a_example',
-    'b_small',
-    'c_medium',
-    'd_quite_big',
-    'e_also_big',
+  'a_example',
+  'b_read_on',
+  'c_incunabula',
+  'd_tough_choices',
+  'e_so_many_books',
+  'f_libraries_of_the_world',
 ];
 
 export interface Reader {
-    max: number;
-    slices: number[];
+  num_books: number;
+  num_libraries: number;
+  num_days: number;
+  scores: number[];
+  libraries: Array<{
+    num_books_in_library: number,
+    num_days_for_signup: number,
+    num_days_to_finish: number,
+    books: number[],
+  }>;
 }
 
 export interface Writer {
-    count: number;
-    types: number[];
+
 }
 
 setup(files, (file, label) => {
-    const input = read(`../in/${file}.in`);
-    log.cyan('INPUT: ', util.inspect(input, {breakLength: Infinity, colors: true}));
+  const input = read(`../in/${file}.txt`);
+  log.cyan('INPUT: ', util.inspect(input, {breakLength: Infinity, colors: true}));
 
-    console.time(label);
-    const output = algorithm(input);
-    console.timeEnd(label);
+  console.time(label);
+  const output = algorithm(input);
+  console.timeEnd(label);
 
-    log.magenta('OUTPUT: ', output);
-    write(output)(`../out/${file}.out`);
+  // log.magenta('OUTPUT: ', output);
+  // write(output)(`../out/${file}.txt`);
 });
