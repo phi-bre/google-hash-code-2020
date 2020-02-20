@@ -2,14 +2,16 @@
   "name": "google-hash-code-2020",
   "version": "1.0.0",
   "scripts": {
-    "setup": "yarn install --ignore-engines",
-    "start": "parcel watch src/index.js --target node",
-    "build": "parcel build src/index.js --target node",
+    "start": "parcel watch src/index.ts --target node",
+    "build": "parcel build src/index.ts --target node",
+    "zip": "zip -vr ./out/source.zip . -x '*.DS_Store' '.git**' 'out/*' 'dist/*' '.cache/*' 'node_modules/*' '*.pdf' '.idea/*'",
     "test": "parcel watch test/index.js --target node"
   },
   "devDependencies": {
+    "@types/node": "^13.7.4",
     "baretest": "^1.0.0",
     "parcel-bundler": "^1.12.4",
-    "parcel-plugin-run-server": "^1.1.2"
+    "parcel-plugin-run-server": "^1.1.2",
+    "typescript": "^3.7.5"
   }
 }
