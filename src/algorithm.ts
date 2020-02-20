@@ -15,10 +15,10 @@ function sortBooksByScore(books: number[], scores: number[]) {
 }
 
 function rankLibrary(library: Library, book_scores: number[], total_days: number, ratio: number): RankedLibrary | null {
-    const percentage = library.num_days_for_signup / total_days;
-    if (percentage > ratio) {
-        return null;
-    }
+    // const percentage = library.num_days_for_signup / total_days;
+    // if (percentage > ratio) {
+    //     return null;
+    // }
 
     total_days -= library.num_days_for_signup;
 
@@ -112,23 +112,38 @@ function runWithRatio(input: Reader, ratio: number): Writer {
 
     const sortedRankedLibraries = rankedLibraries.sort((a, b) => (b.points - a.points));
     const scannedBooks = [];
+    let remainingDays = input.num_days;
 
     const reRankedLibraries = new Array<RankedLibrary>();
 
     for (const ranked of sortedRankedLibraries) {
+        let local = remainingDays;
+
         const books = [];
-        for (const book of ranked.scanable_books) {
+        for (let i = 0; i < ranked.scanable_books.length; i++) {
+            const book = ranked.scanable_books[i];
+
             if (scannedBooks[book] === true) {
                 continue;
             }
 
             scannedBooks[book] = true;
             books.push(book);
+
+            if (i % ranked.library.num_books_per_day === 0) {
+                local--;
+
+                if (local === 0) {
+                    break;
+                }
+            }
         }
 
         if (books.length === 0) {
             continue;
         }
+
+        remainingDays -= ranked.library.num_days_for_signup;
 
         const lib: Library = {
             ...ranked.library,
@@ -147,17 +162,17 @@ function runWithRatio(input: Reader, ratio: number): Writer {
 
 export default function (input: Reader): Writer {
     let output = runWithRatio(input, 0.12);
-    let max = 0;
+    let max = calculateTotal(output.libraries, input.scores, input.num_days);
 
-    for (let ratio = 0.1; ratio < 1; ratio += 0.1) {
-        const res = runWithRatio(input, ratio);
-        const total = calculateTotal(res.libraries, input.scores, input.num_days);
-
-        if (total > max) {
-            output = res;
-            max = total;
-        }
-    }
+    // for (let ratio = 0.05; ratio < 0.5; ratio += 0.05) {
+    //     const res = runWithRatio(input, ratio);
+    //     const total = calculateTotal(res.libraries, input.scores, input.num_days);
+    //
+    //     if (total > max) {
+    //         output = res;
+    //         max = total;
+    //     }
+    // }
 
     console.log(max);
 
