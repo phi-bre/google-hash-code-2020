@@ -35,16 +35,16 @@ export interface Writer {
 
 setup(files, (file, label) => {
   const input = read(`../in/${file}.txt`);
-  log.cyan('INPUT: ', util.inspect(input, {breakLength: Infinity, colors: true}));
+  // log.cyan('INPUT: ', util.inspect(input, {breakLength: Infinity, colors: true}));
 
   console.time(label);
   const output = algorithm(input);
   console.timeEnd(label);
 
-  log.white('TOTAL: ', output.libraries.reduce((prev, cur) =>
-    prev + cur.books.reduce((prev, cur) => prev + input.scores[cur], 0), 0));
-  console.log();
+  // log.white('TOTAL: ', output.libraries.reduce((prev, cur) =>
+  //   prev + cur.books.reduce((prev, cur) => prev + input.scores[cur], 0), 0));
+  // console.log();
 
-  log.magenta('OUTPUT: ', output);
+  // log.magenta('OUTPUT: ', output);
   write(output)(`../out/${file}.txt`);
 });
