@@ -5,12 +5,12 @@ import write from './writer';
 import algorithm from './algorithm';
 
 export const files = [
-  'a_example',
-  'b_read_on',
+  // 'a_example',
+  // 'b_read_on',
   'c_incunabula',
-  'd_tough_choices',
-  'e_so_many_books',
-  'f_libraries_of_the_world',
+  // 'd_tough_choices',
+  // 'e_so_many_books',
+  // 'f_libraries_of_the_world',
 ];
 
 export interface Library {
