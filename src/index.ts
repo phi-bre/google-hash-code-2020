@@ -7,10 +7,10 @@ import algorithm from './algorithm';
 export const files = [
   // 'a_example',
   // 'b_read_on',
-  // 'c_incunabula',
+  'c_incunabula',
   // 'd_tough_choices',
   // 'e_so_many_books',
-  'f_libraries_of_the_world',
+  // 'f_libraries_of_the_world',
 ];
 
 export interface Library {
@@ -19,6 +19,7 @@ export interface Library {
   num_days_for_signup?: number;
   num_books_per_day?: number;
   books: number[];
+  rank?: number;
 }
 
 export interface Reader {
