@@ -7,9 +7,9 @@ import algorithm from './algorithm';
 export const files = [
   // 'a_example',
   // 'b_read_on',
-  'c_incunabula',
+  // 'c_incunabula',
   // 'd_tough_choices',
-  // 'e_so_many_books',
+  'e_so_many_books',
   // 'f_libraries_of_the_world',
 ];
 
@@ -20,6 +20,7 @@ export interface Library {
   num_books_per_day?: number;
   books: number[];
   rank?: number;
+  [key: string]: any;
 }
 
 export interface Reader {
