@@ -1,9 +1,7 @@
 import {Library, Reader} from './index';
 import write from './writer';
-import {log} from "./setup";
+import {log} from './setup';
 
-const limit = (a, min, max) => (a > max ? max : (a < min ? min : a));
-const add = (p, l) => p + l;
 const findMax = reducer => (p, l) => {
     const reduced = reducer(l);
     if (reduced > p) {
@@ -30,106 +28,129 @@ export default function (input: Reader, file: string) {
         .reduce(findMax(i => i.num_books_per_day), Number.MIN_VALUE);
     const libraryThroughputMin = input.libraries
         .reduce(findMin(i => i.num_books_per_day), Number.MAX_VALUE);
-    const weights = [0, 0, 0];
-    const history = [];
-    let weight = 0;
-    let step = 0.1;
+    const rating = new Array(input.scores.length).fill(0);
+    input.libraries.forEach(l => l.books.forEach(b => rating[b] += 1));
+    const ranked = input.libraries.map(rank);
+
     let max = 0;
-    let last = 0;
-    let rate = 1;
+    let weights = [1, 1, 1].map(Math.random);
+    let steps = [0.001, 0.001, 0.001];
+    let last = [0, 0, 0];
+    let weight = 0;
+    let lastPoints = 0;
 
-    while (true) {
-        const ranked = input.libraries
-            .map(l => rank(l))
+    let i = 0, loss = 1;
+    for (let i = 0; i < 1000; i++) {
+    // while (true) {
+
+        const rightWeights = weights.slice();
+        rightWeights[weight] = rightWeights[weight] + steps[weight];
+        const right = evaluate(rightWeights);
+        const leftWeights = weights.slice();
+        leftWeights[weight] = leftWeights[weight] + steps[weight];
+        const left = evaluate(leftWeights);
+
+        // // Overshoots
+        // if ((last[weight] === 1 && right < left) || (last[weight] === -1 && right > left)) {
+        //     // console.log('overshoots');
+        //     // console.log(last[weight], right, left);
+        //     steps[weight] /= 1.1;
+        //     // continue;
+        // }
+
+        // Stuck
+        if (last[weight] === 0 && right === left) {
+            // console.log('stuck');
+            steps[weight] *= 1.1;
+        }
+
+        if (right > left) {
+            weights = rightWeights;
+            last[weight] = 1;
+        } else if (right < left) {
+            weights = leftWeights;
+            last[weight] = -1;
+        } else {
+            last[weight] = 0;
+        }
+
+        if (Math.max(right, left) <= lastPoints) {
+            weight = (weight + 1) % weights.length;
+        }
+
+        lastPoints = Math.max(right, left);
+        // i++;
+    }
+
+    function evaluate(weights: number[]) {
+        for (let i = 0; i < input.libraries.length; i++) {
+            const library = input.libraries[i];
+            library.rank = 0;
+            for (let j = 0; j < weights.length; j++) {
+                library.rank += ranked[i][j] * weights[j];
+            }
+            library.rank /= weights.length;
+        }
+
+        const sorted = Array.prototype.slice.call(input.libraries)
             .sort((a, b) => b.rank - a.rank);
-        const {libraries, points} = score(ranked);
-
+        const {libraries, points} = score(sorted);
         if (points > max) {
             max = points;
             log.magenta('BEST: ' + points.toLocaleString());
             write({libraries})(`../out/${file}.txt`);
         }
 
-        if (last) {
-            rate = Math.abs((points - last) / last);
-        }
-
-        if (points > last) {
-            weights[weight] = limit(weights[weight] + step, 0, Number.MAX_VALUE);
-        }
-
-        if (points < last) {
-            weights[weight] = limit(weights[weight] - step, 0, Number.MAX_VALUE);
-            step /= 1.5;
-        }
-
-        if (rate < 0.001 || step < 0.001 || points === last) {
-            console.log(weights);
-            weight = (weight + 1) % weights.length;
-            step = 0.1;
-            weights[weight] = limit(weights[weight] + step, 0, Number.MAX_VALUE);
-        }
-
-        if (points > last) {
-            last = points;
-        }
+        return points;
     }
 
     function rank(library: Library) {
-        let signUp = library.num_days_for_signup * weights[0]; // less is better
+        let signUp = library.num_days_for_signup; // less is better
         signUp = (signUp - librarySignUpDaysMin) / librarySignUpDaysMax;
         // console.log(signUp)
 
-        let throughput = library.num_books_per_day * weights[1]; // higher is better
+        let throughput = library.num_books_per_day; // higher is better
         throughput = (throughput - libraryThroughputMin) / libraryThroughputMax;
         // console.log(throughput);
 
         const scoreMin = Math.min(...library.books);
         const scoreMax = Math.max(...library.books);
         let scoreAverage = library.books // higher is better
-            .sort((a, b) => input.scores[b] - input.scores[a])
-            .reduce((p, a) => p + a, 0);
-        scoreAverage = (scoreAverage / library.books.length - scoreMin) / scoreMax * weights[2];
-        // console.log(scoreAverage);
+            .reduce((p, b) => p + input.scores[b], 0);
+        // scoreAverage = (scoreAverage / library.books.length - scoreMin) / scoreMax;
+        // console.log(scoreAverage, scoreMin, scoreMax);
 
-        // const duplicates = library.books.map(b => {
-        //         console.log(input.libraries.reduce((p, l) => p + (l.books.indexOf(b) === -1 ? 1 : 0), 0))
-        //         return input.libraries.reduce((p, l) => p + (l.books.indexOf(b) === -1 ? 1 : 0), 0);
-        //     }).reduce(add, 0)
-        //     * duplicateWeight;
-        // console.log(duplicates)
-        const duplicates = 0;
+        let duplicates = library.books
+            .reduce((p, b) => p + rating[b], 0);
+        duplicates = (duplicates - 8) / 35;
 
-        // let amount = input.num_days - library.books.length;
-        // if (amount < 0) amount = 0;
-        // amount = amount / input.num_days * amountBooksWeight;
-        library.rank = (-signUp + throughput + scoreAverage + -duplicates /* + amount */) / 4;
-        return library;
+        return [-signUp, -throughput, scoreAverage];
     }
 
-    function score(libraries) {
-        const books = [];
+    function score(libraries: Library[]) {
+        const bookSet = new Set<number>();
         let points = 0;
         let availableDays = input.num_days;
-        libraries = libraries.map(l => {
-            if (availableDays - l.num_days_for_signup > 0) {
-                availableDays -= l.num_days_for_signup;
-                let counter = 0;
-                return {
-                    id: l.id,
-                    books: l.books.filter(b => {
-                        counter++;
-                        if (counter <= l.num_books_per_day * availableDays) {
-                            if (books.indexOf(b) === -1) {
-                                points += input.scores[b];
-                                books.push(b);
-                                return true;
-                            }
-                        }
-                    })
-                } as Library;
+        const filteredLibraries = [];
+        for (const library of libraries) {
+            if (!(availableDays - library.num_days_for_signup > 0)) continue;
+            availableDays -= library.num_days_for_signup;
+            let counter = 0;
+            const books = [];
+
+            for (const book of library.books) {
+                counter++;
+                if (counter > (library.num_books_per_day * availableDays) || bookSet.has(book)) continue;
+                points += input.scores[book];
+                books.push(book);
+                bookSet.add(book);
             }
-        }).filter(l => !!l).filter(l => !!l.books.length);
-        return {libraries, points};
+
+            if (books.length === 0) continue;
+            filteredLibraries.push({id: library.id, books} as Library);
+        }
+        return {libraries: filteredLibraries, points};
     }
+
+    return max;
 }

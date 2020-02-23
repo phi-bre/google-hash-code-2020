@@ -5,12 +5,12 @@ import write from './writer';
 import algorithm from './algorithm';
 
 export const files = [
-  // 'a_example',
-  // 'b_read_on',
+  'a_example',
+  'b_read_on',
   'c_incunabula',
-  // 'd_tough_choices',
-  // 'e_so_many_books',
-  // 'f_libraries_of_the_world',
+  'd_tough_choices',
+  'e_so_many_books',
+  'f_libraries_of_the_world',
 ];
 
 export interface Library {
@@ -34,18 +34,21 @@ export interface Writer {
   libraries: Library[];
 }
 
+let total = 0;
+
 setup(files, (file, label) => {
   const input = read(`../in/${file}.txt`);
   // log.cyan('INPUT: ', util.inspect(input, {breakLength: Infinity, colors: true}));
 
   console.time(label);
-  algorithm(input, file);
+  total += algorithm(input, file);
   console.timeEnd(label);
 
-  // log.white('TOTAL: ', output.libraries.reduce((prev, cur) =>
   //   prev + cur.books.reduce((prev, cur) => prev + input.scores[cur], 0), 0));
   // console.log();
 
   // log.magenta('OUTPUT: ', output);
   // write(output)(`../out/${file}.txt`);
 });
+
+log.white('TOTAL: ', total.toLocaleString());
