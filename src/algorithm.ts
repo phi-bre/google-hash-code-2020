@@ -18,14 +18,15 @@ export default function (input: Reader, file: string) {
     const booksByScore = Array.prototype.slice.call(input.scores)
         .map((s, i) => [s, i])
         .sort((a, b) => b[0] - a[0])
-        .map(s => s[1]);
+        .map(s => s[1])
+        .filter(s => !(rating[s] === 0));
 
     console.log('Number of sign-up days: ', input.libraries.reduce((p, l) => l.num_days_for_signup + p, 0).toLocaleString());
     console.log('Number of days:', input.num_days.toLocaleString());
     console.log('Number of libraries: ', input.libraries.length.toLocaleString());
     console.log('Number of books: ', input.scores.length.toLocaleString());
     console.log('Books without library: ', rating.reduce((p, c) => c === 0 ? p + 1 : p, 0).toLocaleString());
-    console.log('Number of unique books: ', rating.reduce((p, c) => c === 1 ? p + 1 : p, 0).toLocaleString());
+    console.log('Number of unique books: ', rating.reduce((p, c) => c === 1 ? p + 1 : p, 0).toLocaleString(), rating.reduce((p, c, i) => c === 1 ? p + input.scores[i] : p, 0).toLocaleString());
     console.log('Total score: ', rating.reduce((p, c, i) => c === 0 ? p + input.scores[i] : p, 0).toLocaleString());
 
     // const ranked = input.libraries.map(library => {
@@ -55,7 +56,7 @@ export default function (input: Reader, file: string) {
     // });
 
     let max = 0;
-    optimize(4, weights => {
+    optimize(2, weights => {
         const taken = [] as boolean[];
         let libraries = [] as Library[];
 
@@ -66,7 +67,7 @@ export default function (input: Reader, file: string) {
             // signUp = (signUp - librarySignUpDaysMin) / librarySignUpDaysMax;
             // console.log(signUp)
 
-            let throughput = library.num_books_per_day; // higher is better
+            // let throughput = library.num_books_per_day; // higher is better
             // throughput = (throughput - libraryThroughputMin) / libraryThroughputMax;
             // console.log(throughput);
 
@@ -74,7 +75,10 @@ export default function (input: Reader, file: string) {
             let score = library.books // higher is better
                 .reduce((p, b) => p + input.scores[b], 0);
 
-            const ranked = [-signUp, score];
+            let duplicates = library.books
+                    .reduce((p, b) => p + (rating[b] * input.scores[b]), 0);
+
+            const ranked = [-signUp];
 
             for (let j = 0; j < ranked.length; j++) {
                 library.rank += ranked[j] * weights[j];
@@ -84,42 +88,6 @@ export default function (input: Reader, file: string) {
         }
 
         libraries.sort(((a, b) => b.rank - a.rank));
-
-        // {
-        //     let days = input.num_days;
-        //     const temp = [];
-        //     for (const library of libraries) {
-        //         if (days - library.num_days_for_signup <= 0) break;
-        //         days -= library.num_days_for_signup;
-        //         library.throughput = days * library.num_books_per_day;
-        //         temp.push(library);
-        //     }
-        //     libraries = temp;
-        // }
-        //
-        // for (const book of booksByScore) {
-        //     const included = libraries
-        //         .filter(l => l.books.indexOf(book) === -1)
-        //         // .sort((a, b) => b.throughput - a.throughput);
-        //
-        //     for (const library of included) {
-        //         if (!library.registered) {
-        //             library.registered = [];
-        //         }
-        //
-        //         if (library.registered.length !== library.throughput) {
-        //             library.registered.push(book);
-        //             break;
-        //         }
-        //     }
-        // }
-
-        // let points = 0;
-        // for (const library of libraries) {
-        //     library.registered.forEach(b => points += input.scores[b]);
-        // }
-
-        // console.log(points);
 
         for (const library of libraries) {
             library.books = library.books.filter(b => {
@@ -135,18 +103,89 @@ export default function (input: Reader, file: string) {
             // score = (score / library.books.length - scoreMin) / scoreMax;
             // console.log(score, scoreMin, scoreMax);
 
-            let duplicates = library.books
-                .reduce((p, b) => p + (rating[b] * input.scores[b]), 0);
+            // let duplicates = library.books
+            //     .reduce((p, b) => p + (rating[b] * input.scores[b]), 0);
             // duplicates = (duplicates - 8) / 35;
 
             library.rank = score * weights[2] + library.num_days_for_signup * weights[3]// + duplicates
             //+ duplicates * weights[3];
         }
 
-        const sorted = Array.prototype.slice.call(libraries)
+        let sorted = Array.prototype.slice.call(libraries)
             .sort((a, b) => b.rank - a.rank);
+
+        console.log(sorted.length);
+        // let sorted = libraries;
+
+        let days = input.num_days;
+        const filtered = [] as Library[];
+        for (const library of sorted) {
+            if (days - library.num_days_for_signup < 0) break;
+            days -= library.num_days_for_signup;
+            library.throughput = days * library.num_books_per_day;
+            filtered.push(library);
+        }
+
+        // console.log(filtered.length);
+
+        let lost = 0;
+        // const books = filtered.reduce((a, c) => Array.from(new Set<number>([...a, ...c.books])), []);
+        const books = new Set<number>();
+        filtered.forEach(l => l.books.forEach(books.add, books));
+        console.log(books.size);
+        // console.log('Total books: ', filtered.reduce((p, l) => l.books.length + p, 0));
+        // console.log(filtered.filter(l => l.books.includes(75160)).length);
+        for (const book of Array.from(books)) {
+            // if (filtered
+            //     .filter(l => l.books.indexOf(book) >= 0).length === 1) {
+            //     lost++;
+            // }
+
+            const included = [] as Library[];
+            for (const library of filtered) {
+                if (library.books.indexOf(book) >= 0) {
+                    included.push(library);
+                }
+            }
+            included.sort((a, b) => a.throughput - b.throughput);
+            for (const library of included) {
+                library.registered = library.registered || [];
+                if (library.registered.length >= library.throughput) continue;
+                library.registered.push(book);
+                break;
+            }
+            //
+            // const find = filtered
+            //     .filter(l => l.books.indexOf(book) >= 0)
+            //     .sort((a, b) => a.throughput - b.throughput)
+            //     .find(library => {
+            //         library.registered = library.registered || [];
+            //         if (library.registered.length <= library.throughput) {
+            //             library.registered.push(book);
+            //             return true;
+            //         }
+            //     });
+            // if (!find) {
+            //     lost++;
+            // }
+        }
+
+        console.log('LOST: ', lost);
+        console.log('Total books: ', filtered.reduce((p, l) => l.books.length + p, 0));
+
+        let points = 0;
+        for (const library of filtered) {
+            library.registered.forEach(b => points += input.scores[b]);
+            library.books = library.registered;
+            library.registered = [];
+        }
+
+        // console.log('Total points');
+
         // const sorted = libraries;
-        let scored = score(input, sorted);
+        let scored = score(input, filtered);
+
+        console.log('Total books: ', scored.libraries.reduce((p, l) => l.books.length + p, 0));
 
         // console.log(scored.points)
 
@@ -185,11 +224,13 @@ function score(input: Reader, sorted: Library[]) {
         if (books.length === 0) continue;
         libraries.push({id: library.id, books});
     }
+
+    console.log(libraries.length);
     return {libraries, points};
 }
 
 function optimize(numWeights: number, evaluate: (weights: number[]) => number) {
-    let weights = new Array(numWeights).fill(0.1)//.map(Math.random)//.map(n => n * 3);
+    let weights = new Array(numWeights).fill(0.1).map(Math.random)//.map(n => n * 3);
     let steps = new Array(numWeights).fill(0.01);
     let last = new Array(numWeights).fill(0);
     let weight = 0;
