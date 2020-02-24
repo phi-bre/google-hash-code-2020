@@ -1,13 +1,6 @@
 
 export default function (numWeights: number, evaluate: (weights: number[]) => number) {
-    let weights = new Array(numWeights).fill(1)//.map(Math.random)//.map(n => n * 3);
-    // weights[2] = 30;
-    // weights = [ 2.8178714120449726e+44,
-    //     -6.767382942635375e+47,
-    //     -6.256130516092174e+34,
-    //     7046937205592827000,
-    //     -76466480538567280,
-    //     -1.764675160286639e+47 ];
+    let weights = new Array(numWeights).fill(1).map(Math.random)//.map(n => n * 3)
     let steps = new Array(numWeights).fill(1)//.map(Math.random);
     let last = new Array(numWeights).fill(0);
     let weight = 0;
