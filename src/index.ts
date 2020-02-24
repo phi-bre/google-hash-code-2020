@@ -19,8 +19,11 @@ export interface Library {
   num_days_for_signup?: number;
   num_books_per_day?: number;
   books: number[];
+  set?: Set<number>;
+  table?: number[];
   rank?: number;
-  [key: string]: any;
+  registered?: number[];
+  throughput?: number;
 }
 
 export interface Reader {
