@@ -1,6 +1,6 @@
 
 export default function (numWeights: number, evaluate: (weights: number[]) => number) {
-    let weights = new Array(numWeights).fill(1).map(Math.random)//.map(n => n * 3)
+    let weights = new Array(numWeights).fill(1)//.map(Math.random)//.map(n => n * 3)
     let steps = new Array(numWeights).fill(1)//.map(Math.random);
     let last = new Array(numWeights).fill(0);
     let weight = 0;

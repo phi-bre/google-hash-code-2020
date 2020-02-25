@@ -4,7 +4,7 @@
   "scripts": {
     "start": "parcel watch src/index.ts --target node",
     "build": "parcel build src/index.ts --target node",
-    "zip": "zip -vr ./out/source.zip . -x '*.DS_Store' '.git**' 'out/*' 'dist/*' '.cache/*' 'node_modules/*' '*.pdf' '.idea/*'",
+    "zip": "zip -vr ./out/source.zip . -x '*.DS_Store' '.git**' 'out/*' 'dist/*' '.cache/*' 'node_modules/*' '*.pdf' '.idea/*' 'test/*'",
     "test": "parcel watch test/index.js --target node"
   },
   "devDependencies": {

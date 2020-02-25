@@ -25,22 +25,32 @@ export default function (input: Reader, file: string) {
         library.books.each(book => library.table[book] = input.scores[book]);
         library.set = new Set<number>(library.books);
         library.books = [];
+        // library.total_score = library.table.reduce((score, book) => score + book, 0);
     }
 
     console.log('COLLECTING');
     const collected = new Array(input.scores.length).fill(0).map(s => []);
     libraries.each(library => library.set.forEach(book => collected[book].push(library)));
-    blub(collected.sort((a, b) => b.length - a.length).reduce((p, c) => p + ' ' + c.length, ''))(`../out/distribution.txt`);
+    // blub(collected.sort((a, b) => b.length - a.length).reduce((p, c) => p + ' ' + c.length, ''))(`../out/distribution.txt`);
 
     console.log('OPTIMIZING');
-    optimize(5, weights => {
+    optimize(6, weights => {
         let points = 0;
 
-        libraries.each(library => library.rank = (
-            - library.num_days_for_signup * weights[0]
-            + library.num_books_per_day * weights[1]
-        ));
+        // Sort libraries
+        libraries.each(library => {
+            library.books = [];
+            library.rank = (
+                // - library.num_days_for_signup * weights[0]
+                // + library.num_books_per_day * weights[1]
+                + library.set.size * weights[4]
+                // + library.total_score / library.set.size * weights[5]
+            );
+        });
+        libraries.sort((a, b) => b.rank - a.rank);
 
+        const collected = new Array(input.scores.length).fill(0).map(s => []);
+        libraries.each(library => library.set.forEach(book => collected[book].push(library)));
         collected.each((libraries, book) => {
             if (!libraries.length) return;
             const uniqueness = libraries.length;
@@ -48,7 +58,7 @@ export default function (input: Reader, file: string) {
 
             let largest = libraries[0];
             for (const library of libraries) {
-                if (library.set.size > largest.set.size) {
+                if (library.rank > largest.rank) {
                     largest = library;
                 }
             }
@@ -60,7 +70,8 @@ export default function (input: Reader, file: string) {
             );
         });
 
-        libraries.each(library => library.rank += (
+
+        libraries.each(library => library.rank = (
             + library.books.length * weights[4]
         ));
 
