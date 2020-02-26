@@ -12,7 +12,7 @@ export default function* (input: Reader) {
         library.throughput = 0;
     });
 
-    // COLLECTING
+    // ASSOCIATE BOOKS WITH LIBRARIES
     const collected = new Array(input.scores.length).fill(0).map(() => []) as Library[][];
     libraries.each(library => {
         library.set.each(book => {
@@ -20,7 +20,7 @@ export default function* (input: Reader) {
         });
     });
 
-    // FILTERING
+    // FILTER OUT UNUSED BOOKS
     const filtered = [] as number[];
     collected.each((libraries, book) => {
         if (libraries.length) {
@@ -43,12 +43,11 @@ export default function* (input: Reader) {
         // LIBRARY ASSOCIATIONS FOR BOOKS
         filtered.each(book => {
             collected[book].each(library => {
-                library.rank += (
-                    + library.set.length * weights[0]
-                    - library.num_days_for_signup * weights[1]
-                    + library.num_books_per_day * weights[2]
-                    + library.throughput * weights[8]
-                    // - library.num_days_for_signup / input.num_days * weights[9]
+                library.rank += (0
+                    - library.num_days_for_signup * weights[0]
+                    // + library.num_books_per_day * weights[1]
+                    // + library.throughput * weights[2]
+                    // + library.set.length * weights[3]
                 )
             });
             collected[book].sort((a, b) => b.rank - a.rank);
@@ -57,8 +56,8 @@ export default function* (input: Reader) {
         // SORT BOOKS
         filtered.each(book => {
             rank[book] = (
-                + collected[book].length * weights[3]
-                + input.scores[book] * weights[4]
+                + collected[book].length * weights[4] // The rarity of the book
+                + input.scores[book] * weights[5] // The score of the book
             );
         });
         filtered.sort((a, b) => rank[b] - rank[a]);
@@ -68,20 +67,19 @@ export default function* (input: Reader) {
             const libraries = collected[book];
             libraries.each(library => {
                 library.rank += (
-                    library.books.length * weights[5]
+                    library.books.length * weights[6]
                 );
             });
             const [best] = libraries.sort((a, b) => b.rank - a.rank);
             best.rank += (
-                + libraries.length * weights[6]
-                + input.scores[book] * weights[7]
+                + libraries.length * weights[7] // How unique the book is
+                + input.scores[book] * weights[8] // How many points the book can score
             );
             best.books.push(book);
         });
 
         // SORT LIBRARIES
         libraries.sort(((a, b) => b.rank - a.rank));
-        libraries.each(library => library.throughput = 0);
 
         // CALCULATE THROUGHPUT AND POINTS
         let days = input.num_days, points = 0;
@@ -89,13 +87,24 @@ export default function* (input: Reader) {
         for (const library of libraries) {
             if (days - library.num_days_for_signup < 0) continue;
             days -= library.num_days_for_signup;
-            if (days < 0) days = 0;
             library.throughput = days * library.num_books_per_day;
+            if (library.throughput > library.set.length) {
+                library.throughput = library.set.length;
+            }
             library.books.slice(0, library.throughput).each(book => points += input.scores[book]);
             simulated.push(library);
         }
 
         // TODO: TRY REDISTRIBUTING LOST BOOKS
+        // simulated.each(library => {
+        //     const unused = library.set
+        //         .filter(book => !library.books.includes(book))
+        //         .filter(book => !simulated.find(l => l !== library && !l.books.includes(book)));
+        //     if (unused.length && library.throughput) {
+        //         console.log(unused.length, library.throughput);
+        //     }
+        // });
+        console.log(input.num_books, simulated.reduce((p, library) => p + library.books.length, 0), simulated.length);
 
         yield {points, weights, libraries: simulated};
         ({value: weights, done} = optimizer.next(points));
