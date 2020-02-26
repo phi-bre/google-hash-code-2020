@@ -9,7 +9,7 @@ export function write(string: string) {
     }
 }
 
-export default function (writer: Writer) {
+export default function writer(writer: Writer) {
     let output = writer.libraries.length.toString() + '\n';
 
     for (const library of writer.libraries) {

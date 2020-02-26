@@ -3,7 +3,11 @@ import * as p from 'path';
 import {Library, Reader} from './index';
 
 export function read(path: string) {
-  return fs.readFileSync(p.join(__dirname, path)).toString('utf8');
+  try {
+    return fs.readFileSync(p.join(__dirname, path)).toString('utf8')
+  } catch (e) {
+    return undefined;
+  }
 }
 
 export default function (path: string): Reader {

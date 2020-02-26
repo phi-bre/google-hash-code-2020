@@ -23,7 +23,7 @@ export const log = {
     bold: logger(colors.bold),
 };
 
-export function setup(files: string[], run: (file: string, label: string) => void) {
+export function setup(files: string[], run: (file: string, label: string) => void | Promise<void>) {
     console.log(`${colors.white}${colors.reset}`);
     log.white('Google Hash Code 2020 🎉');
     for (const file of files) {
