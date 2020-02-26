@@ -32,3 +32,20 @@ export function setup(files: string[], run: (file: string, label: string) => voi
         process.stdout.write(colors.reset);
     }
 }
+
+declare global {
+    interface Array<T> {
+        each(callback: (value: T, index: number, array: T[]) => any): this;
+        move(index: number, to: number): this;
+    }
+}
+
+Array.prototype.each = function (callback) {
+    this.forEach(callback);
+    return this;
+};
+
+Array.prototype.move = function(from, to) {
+    this.splice(to, 0, this.splice(from, 1)[0]);
+    return this;
+};

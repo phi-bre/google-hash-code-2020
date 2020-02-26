@@ -8,18 +8,19 @@ export const files = [
   // 'a_example',
   // 'b_read_on',
   // 'c_incunabula',
-  'd_tough_choices',
-  // 'e_so_many_books',
+  // 'd_tough_choices',
+  'e_so_many_books',
   // 'f_libraries_of_the_world',
 ];
 
 export interface Library {
+  associations: Library[][];
   id: number;
   num_books_in_library?: number;
   num_days_for_signup?: number;
   num_books_per_day?: number;
   books: number[];
-  set?: Set<number>;
+  set?: number[];
   table?: number[];
   rank?: number;
   registered?: number[];
