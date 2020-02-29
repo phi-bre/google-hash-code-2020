@@ -1,8 +1,42 @@
 import {Library, Reader} from './index';
 import optimize from './optimize';
+import {log} from "./setup";
+
+interface Statistic {
+    max: number;
+    min: number;
+    average: number;
+    spread: number;
+}
+
+function stats<T>(array: T[], reducer: (item: T) => number = item => item as unknown as number): Statistic {
+    // TODO: Consider statistical outliers
+    const reduced = array.map(reducer);
+    const average = array.reduce((a, _, i) => a + reduced[i], 0) / array.length;
+    const max = Math.max(...reduced);
+    const min = Math.min(...reduced);
+    const spread = (average - min) / max;
+    return {max, min, average, spread};
+}
 
 export default function* (input: Reader) {
     let libraries = input.libraries;
+
+    const statistics = {
+        score: stats(input.scores),
+        signup: stats(libraries, library => library.num_days_for_signup),
+        fake: stats(libraries, library => library.num_books_per_day),
+        throughput: stats(libraries, library => library.num_books_per_day),
+        // throughput: stats(libraries, library =>
+        //     (library.num_books_per_day * input.num_days > library.books.length)
+        //         ? library.books.length : library.num_books_per_day * input.num_days),
+        size: stats(libraries, library => library.books.length),
+        rarity: null as Statistic,
+    };
+
+    log.white('DAYS:', input.num_days.toLocaleString());
+    log.white('LIBRARIES:', input.num_libraries.toLocaleString());
+    log.white('BOOKS:', input.num_books.toLocaleString());
 
     // SETUP
     libraries.each(library => {
@@ -28,26 +62,29 @@ export default function* (input: Reader) {
         }
     });
 
+    statistics.rarity = stats(filtered, book => collected[book].length);
+    console.table(statistics);
+
     // OPTIMIZING
     const rank = [];
-    const optimizer = optimize(Infinity, 10);
+    const optimizer = optimize(Infinity, 9);
     let {value: weights, done} = optimizer.next();
     while (!done) {
 
         // RESET
         libraries.each(library => {
             library.books.length = 0;
-            library.rank = 0;
+            library.rank = 0 //-library.set.reduce((p, book) => p + collected[book].length - 1, 0) * weights[0];
         });
 
         // LIBRARY ASSOCIATIONS FOR BOOKS
         filtered.each(book => {
             collected[book].each(library => {
-                library.rank += (0
-                    - library.num_days_for_signup * weights[0]
-                    // + library.num_books_per_day * weights[1]
-                    // + library.throughput * weights[2]
-                    // + library.set.length * weights[3]
+                library.rank += (
+                    - library.num_days_for_signup * weights[1]
+                    + library.num_books_per_day * weights[2]
+                    // + library.throughput * weights[0]
+                    + library.set.length * weights[3]
                 )
             });
             collected[book].sort((a, b) => b.rank - a.rank);
@@ -72,7 +109,7 @@ export default function* (input: Reader) {
             });
             const [best] = libraries.sort((a, b) => b.rank - a.rank);
             best.rank += (
-                + libraries.length * weights[7] // How unique the book is
+                + libraries.length * weights[7]// How unique the book is
                 + input.scores[book] * weights[8] // How many points the book can score
             );
             best.books.push(book);
@@ -96,15 +133,15 @@ export default function* (input: Reader) {
         }
 
         // TODO: TRY REDISTRIBUTING LOST BOOKS
-        // simulated.each(library => {
-        //     const unused = library.set
-        //         .filter(book => !library.books.includes(book))
-        //         .filter(book => !simulated.find(l => l !== library && !l.books.includes(book)));
-        //     if (unused.length && library.throughput) {
-        //         console.log(unused.length, library.throughput);
-        //     }
-        // });
-        console.log(input.num_books, simulated.reduce((p, library) => p + library.books.length, 0), simulated.length);
+        simulated.each(library => {
+            const unused = library.set
+                .filter(book => !library.books.includes(book))
+                .filter(book => !simulated.find(l => l !== library && !l.books.includes(book)));
+            if (unused.length && library.throughput) {
+                console.log(unused.length, library.throughput);
+            }
+        });
+        // console.log(input.num_books, simulated.reduce((p, library) => p + library.books.length, 0), simulated.length);
 
         yield {points, weights, libraries: simulated};
         ({value: weights, done} = optimizer.next(points));

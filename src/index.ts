@@ -3,14 +3,15 @@ import {log, setup} from './setup';
 import reader, {read} from './reader';
 import writer, {write} from './writer';
 import algorithm from './algorithm';
+import { fork } from 'child_process';
 
 export const files = [
   // 'a_example',
   // 'b_read_on',
-  // 'c_incunabula',
+  'c_incunabula',
   'd_tough_choices',
-  // 'e_so_many_books',
-  // 'f_libraries_of_the_world',
+  'e_so_many_books',
+  'f_libraries_of_the_world',
 ];
 
 export interface Library {
@@ -22,6 +23,7 @@ export interface Library {
   set?: number[];
   rank?: number;
   throughput?: number;
+  score?: number;
 }
 
 export interface Reader {
@@ -36,22 +38,51 @@ export interface Writer {
   libraries: Library[];
 }
 
-const total = [];
+const total = {
+  'a_example': 21,
+  'b_read_on':  5_822_900,
+};
 
-setup(files, async file => {
+setup(files, async (file, label) => {
   const input = reader(`../in/${file}.txt`);
-  // const weights = JSON.parse(read(`../out/${file}.weights.json`));
-  let max = 0;
+  total[file] = 0;
 
-  for await (const {points, weights, libraries} of algorithm(input)) {
-    if (points > max) {
-      max = points;
-      total[file] = max;
-      log.cyan('FILE: ' + file + ' POINTS: ' + points.toLocaleString());
-      log.magenta('TOTAL: ' + Object.keys(total).reduce((t, file) => t + total[file], 0).toLocaleString());
-      console.log(util.inspect(weights.map(weight => Number(weight.toPrecision(3))), {breakLength: Infinity}));
-      writer({libraries})(`../out/${file}.txt`);
-      // write(JSON.stringify(weights))(`../out/${file}.weights.json`);
+  const process = fork('dist/worker.js');
+  process.send({input, label});
+
+  process.on('message', ({points, libraries}: any) => {
+    total[file] = points;
+    console.log();
+    console.log();
+    console.log();
+    console.log();
+    console.log();
+    console.log();
+    console.log();
+    console.log();
+    console.log();
+    console.log();
+    console.log();
+    console.log();
+    console.log();
+    console.log();
+    console.log();
+    console.log();
+    console.log();
+    console.log();
+    console.log();
+    console.log();
+    console.log();
+    console.log();
+    console.log();
+    console.log();
+    console.log();
+    console.log();
+    for (const file in total) {
+      log.cyan('FILE: ' + file + ' POINTS: ' + total[file].toLocaleString());
     }
-  }
+    log.magenta('TOTAL: ' + Object.keys(total).reduce((t, file) => t + total[file], 0).toLocaleString());
+    // console.log(util.inspect(weights.map(weight => Number(weight.toPrecision(3))), {breakLength: Infinity}));
+    writer({libraries})(`../out/${file}.txt`);
+  })
 });

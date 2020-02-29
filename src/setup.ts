@@ -8,11 +8,7 @@ export const colors = {
 
 function logger(color: string) {
     return function (title: string, ...value: any[]) {
-        console.log(`${color}${title}${colors.reset}`);
-        if (value.length) {
-            console.log(...value);
-            console.log();
-        }
+        console.log(`${color}${title}${colors.reset}`, ...value);
     }
 }
 
@@ -40,12 +36,18 @@ declare global {
     }
 }
 
-Array.prototype.each = function (callback) {
-    this.forEach(callback);
-    return this;
-};
+Object.defineProperty(Array.prototype, 'each', {
+    value(callback) {
+        this.forEach(callback);
+        return this;
+    },
+    enumerable: false,
+});
 
-Array.prototype.move = function(from, to) {
-    this.splice(to, 0, this.splice(from, 1)[0]);
-    return this;
-};
+Object.defineProperty(Array.prototype, 'move', {
+    value(from, to) {
+        this.splice(to, 0, this.splice(from, 1)[0]);
+        return this;
+    },
+    enumerable: false,
+});

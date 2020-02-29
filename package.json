@@ -2,8 +2,8 @@
   "name": "google-hash-code-2020",
   "version": "1.0.0",
   "scripts": {
-    "start": "parcel watch src/index.ts --target node",
-    "build": "parcel build src/index.ts --target node",
+    "start": "parcel watch src/index.ts src/worker.ts --target node",
+    "build": "parcel build src/index.ts src/worker.ts --target node",
     "zip": "zip -vr ./out/source.zip . -x '*.DS_Store' '.git**' 'out/*' 'dist/*' '.cache/*' 'node_modules/*' '*.pdf' '.idea/*' 'test/*'",
     "test": "parcel watch test/index.js --target node"
   },
