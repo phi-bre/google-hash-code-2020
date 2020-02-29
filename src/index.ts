@@ -21,6 +21,7 @@ export interface Library {
   books: number[];
   set?: number[];
   rank?: number;
+  table?: number[];
   throughput?: number;
 }
 
@@ -38,20 +39,26 @@ export interface Writer {
 
 const total = [];
 
-setup(files, async file => {
+setup(files, (file, label) => {
   const input = reader(`../in/${file}.txt`);
-  // const weights = JSON.parse(read(`../out/${file}.weights.json`));
-  let max = 0;
 
-  for await (const {points, weights, libraries} of algorithm(input)) {
-    if (points > max) {
-      max = points;
-      total[file] = max;
-      log.cyan('FILE: ' + file + ' POINTS: ' + points.toLocaleString());
-      log.magenta('TOTAL: ' + Object.keys(total).reduce((t, file) => t + total[file], 0).toLocaleString());
-      console.log(util.inspect(weights.map(weight => Number(weight.toPrecision(3))), {breakLength: Infinity}));
-      writer({libraries})(`../out/${file}.txt`);
-      // write(JSON.stringify(weights))(`../out/${file}.weights.json`);
-    }
-  }
+  console.log();
+  console.time(label);
+  // for (const {points, libraries} of algorithm(input)) {
+  //   // if (points > max) {
+  //   //   max = points;
+  //   //   total[file] = max;
+  //   //   log.cyan('FILE: ' + file + ' POINTS: ' + points.toLocaleString());
+  //   //   // console.log(util.inspect(weights.map(weight => Number(weight.toPrecision(3))), {breakLength: Infinity}));
+  //   //   writer({libraries})(`../out/${file}.txt`);
+  //   //   // write(JSON.stringify(weights))(`../out/${file}.weights.json`);
+  //   // }
+  // }
+  const {points, libraries} = algorithm(input);
+  total[file] = points;
+  writer({libraries})(`../out/${file}.txt`);
+  console.timeEnd(label);
+  log.cyan('POINTS: ' + points.toLocaleString());
 });
+
+log.magenta('TOTAL: ' + Object.keys(total).reduce((t, file) => t + total[file], 0).toLocaleString());

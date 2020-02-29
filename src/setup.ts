@@ -8,11 +8,7 @@ export const colors = {
 
 function logger(color: string) {
     return function (title: string, ...value: any[]) {
-        console.log(`${color}${title}${colors.reset}`);
-        if (value.length) {
-            console.log(...value);
-            console.log();
-        }
+        console.log(`${color}${title}${colors.reset}`, ...value);
     }
 }
 
