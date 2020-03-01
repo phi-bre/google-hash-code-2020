@@ -50,39 +50,13 @@ setup(files, async (file, label) => {
   const process = fork('dist/worker.js');
   process.send({input, label});
 
-  process.on('message', ({points, libraries}: any) => {
+  process.on('message', ({points, libraries, weights}: any) => {
     total[file] = points;
-    console.log();
-    console.log();
-    console.log();
-    console.log();
-    console.log();
-    console.log();
-    console.log();
-    console.log();
-    console.log();
-    console.log();
-    console.log();
-    console.log();
-    console.log();
-    console.log();
-    console.log();
-    console.log();
-    console.log();
-    console.log();
-    console.log();
-    console.log();
-    console.log();
-    console.log();
-    console.log();
-    console.log();
-    console.log();
-    console.log();
     for (const file in total) {
       log.cyan('FILE: ' + file + ' POINTS: ' + total[file].toLocaleString());
     }
     log.magenta('TOTAL: ' + Object.keys(total).reduce((t, file) => t + total[file], 0).toLocaleString());
-    // console.log(util.inspect(weights.map(weight => Number(weight.toPrecision(3))), {breakLength: Infinity}));
+    console.log(util.inspect(weights.map(weight => Number(weight.toPrecision(3))), {breakLength: Infinity}));
     writer({libraries})(`../out/${file}.txt`);
   })
 });

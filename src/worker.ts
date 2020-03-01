@@ -6,8 +6,7 @@ process.on('message', async ({input, label}) => {
     for await (const {points, weights, libraries} of algorithm(input)) {
         if (points > max) {
             max = points;
-            process.send({points, libraries});
-            // console.log(weights);
+            process.send({points, libraries, weights});
         }
     }
     console.timeEnd(label);

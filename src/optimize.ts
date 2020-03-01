@@ -7,6 +7,7 @@ export default function* (count: number, numWeights: number, initial?: number[])
     let weight = 0;
     let lastPoints = 0;
     let lastWeights = [], lastSteps = [], lastLast = [];
+    let overshoots = 0, stucks = 0;
 
     for (let i = 0; i < count; i++) {
         const rightWeights = weights.slice();
@@ -19,11 +20,17 @@ export default function* (count: number, numWeights: number, initial?: number[])
         // Overshoots
         if ((last[weight] === 1 && right < left) || (last[weight] === -1 && right > left)) {
             steps[weight] /= 2;
+            overshoots++;
         }
 
         // Stuck
         if ((last[weight] === 0) && (right === left)) {
-            steps[weight] *= 2;
+            steps[weight] *= 1.5;
+            stucks++;
+        }
+
+        if ((last[weight] === 1 && right > left) || (last[weight] === -1 && right < left)) {
+            steps[weight] *= 1.5;
         }
 
         const better = Math.max(right, left) > lastPoints;
@@ -38,6 +45,10 @@ export default function* (count: number, numWeights: number, initial?: number[])
             last[weight] = 0;
         }
 
+        if (better) {
+            stucks = overshoots = 0;
+        }
+
         if (!better) {
             if ((weight + 1) % weights.length === 0) {
                 if (weights.toString() === lastWeights.toString() && steps.toString() === lastSteps.toString()) {
@@ -46,8 +57,11 @@ export default function* (count: number, numWeights: number, initial?: number[])
                 lastWeights = weights;
                 lastSteps = [...steps];
                 lastLast = [...lastLast];
+                if (stucks > 30) {
+                    console.log('stop');
+                    return;
+                }
             }
-            // console.log(weights.toString() === lastWeights.toString(), steps.toString() === lastSteps.toString());
             weight = (weight + 1) % weights.length;
         }
 
