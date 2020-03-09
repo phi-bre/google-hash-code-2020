@@ -33,6 +33,7 @@ declare global {
     interface Array<T> {
         each(callback: (value: T, index: number, array: T[]) => any): this;
         move(index: number, to: number): this;
+        remove(item: T): this;
     }
 }
 
@@ -47,6 +48,14 @@ Object.defineProperty(Array.prototype, 'each', {
 Object.defineProperty(Array.prototype, 'move', {
     value(from, to) {
         this.splice(to, 0, this.splice(from, 1)[0]);
+        return this;
+    },
+    enumerable: false,
+});
+
+Object.defineProperty(Array.prototype, 'remove', {
+    value(item) {
+        this.splice(this.indexOf(item), 1);
         return this;
     },
     enumerable: false,
